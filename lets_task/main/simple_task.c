@@ -5,6 +5,7 @@
 #include "esp_timer.h"
 
 //#define GET_STACK
+#define TEST_2
 
 #define LED_GPIO    GPIO_NUM_2
 #define BUTTON_GPIO GPIO_NUM_0
@@ -12,6 +13,7 @@
 
 static const char *TAG = "TASKS";
 
+#if defined(TEST_1)
 static const gpio_config_t io_conf_led_task = {
         .pin_bit_mask = (1ULL << LED_GPIO),
         .mode = GPIO_MODE_OUTPUT,
@@ -81,6 +83,7 @@ ESP_LOGI(TAG, "Stack minimo libero: %u byte", (unsigned)libero);
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
+#endif /*defined(TEST_1)*/
 
 static void big_task(void *arg)
 {
@@ -110,6 +113,7 @@ static void small_task(void *arg)
 void app_main(void)
 {
 
+    #if defined(TEST_1)
     TaskHandle_t task_handle = NULL;
 
     /* Task With Pinned Core */
@@ -126,14 +130,15 @@ void app_main(void)
     {
         ESP_LOGE(TAG, "button_task creation FAILED");
     }
+#endif /*defined(TEST_1)*/    
 
-    /* Normal Task */
+    /* High Prio Task */
     if (xTaskCreate(big_task, "big_task", 2048, NULL, 7, NULL) != pdPASS) 
     {
         ESP_LOGE(TAG, "big_task creation FAILED");
     }
 
-    /* Normal Task */
+    /* Low Prio Task */
     if (xTaskCreate(small_task, "small_task", 2048, NULL, 3, NULL) != pdPASS) 
     {
         ESP_LOGE(TAG, "big_task creation FAILED");
