@@ -1,0 +1,11 @@
+# PlatformIO
+.pio/
+
+# ESP-IDF
+build/
+managed_components/
+
+# Editor e file di sistema
+.vscode/
+.DS_Store
+Thumbs.db
