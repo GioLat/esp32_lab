@@ -2,6 +2,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 
 //#define GET_STACK
 
@@ -81,6 +82,30 @@ ESP_LOGI(TAG, "Stack minimo libero: %u byte", (unsigned)libero);
     }
 }
 
+static void big_task(void *arg)
+{
+    while (1) 
+    {
+        ESP_LOGI(TAG, "[BIG] ring at %lld us", (long long)esp_timer_get_time());
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+
+static void small_task(void *arg)
+{
+    while (1)
+    {
+        int64_t t0 = esp_timer_get_time();
+        while (esp_timer_get_time() - t0 < 4000000)
+         {
+            /* ruuun */
+        }
+        ESP_LOGI(TAG, "[SMALL] task completed");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 
 void app_main(void)
 {
@@ -90,16 +115,28 @@ void app_main(void)
     /* Task With Pinned Core */
     if (xTaskCreatePinnedToCore(led_task, "led_task", 2048, (void *)(&io_conf_led_task), 5, &task_handle, 1) != pdPASS) 
     {
-        ESP_LOGE(TAG, "Creazione di led_task fallita");
-    }
-
-    /* Normal Task */
-    if (xTaskCreate(button_task, "button_task", 2048, (void *)(&io_conf_button_task), 5, NULL) != pdPASS) 
-    {
-        ESP_LOGE(TAG, "Creazione di button_task fallita");
+        ESP_LOGE(TAG, "led_task creation FAILED");
     }
 
     /* Delete Task */
     vTaskDelete(task_handle);
+
+    /* Normal Task */
+    if (xTaskCreate(button_task, "button_task", 2048, (void *)(&io_conf_button_task), 5, NULL) != pdPASS) 
+    {
+        ESP_LOGE(TAG, "button_task creation FAILED");
+    }
+
+    /* Normal Task */
+    if (xTaskCreate(big_task, "big_task", 2048, NULL, 7, NULL) != pdPASS) 
+    {
+        ESP_LOGE(TAG, "big_task creation FAILED");
+    }
+
+    /* Normal Task */
+    if (xTaskCreate(small_task, "small_task", 2048, NULL, 3, NULL) != pdPASS) 
+    {
+        ESP_LOGE(TAG, "big_task creation FAILED");
+    }
 
 }
