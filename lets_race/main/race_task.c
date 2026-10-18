@@ -127,9 +127,9 @@ void app_main(void)
     sBinary = xSemaphoreCreateBinary();
 
     /* Create Button Task */
-    if (xTaskCreatePinnedToCore(button_task, "task_1", 2048, NULL, 10, NULL, 1) != pdPASS) 
+    if (xTaskCreatePinnedToCore(button_task, "button_task", 2048, NULL, 10, NULL, 1) != pdPASS) 
     {
-        ESP_LOGE(TAG, "task_2 creation FAILED");
+        ESP_LOGE(TAG, "button_task creation FAILED");
     }
 
 }
