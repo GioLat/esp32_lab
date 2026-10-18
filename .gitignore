@@ -4,8 +4,10 @@
 # ESP-IDF
 build/
 managed_components/
+sdkconfig
 
 # Editor e file di sistema
 .vscode/
 .DS_Store
 Thumbs.db
+
